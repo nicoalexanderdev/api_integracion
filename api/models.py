@@ -12,6 +12,7 @@ class Producto(models.Model):
   nombre = models.CharField(max_length=100)
   precio = models.IntegerField()
   descripcion = models.TextField()
+  imagen_url = models.URLField(default='')
   marca = models.ForeignKey(Marca, on_delete=models.PROTECT)
 
 def __str__(self):
