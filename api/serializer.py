@@ -4,12 +4,12 @@ from .models import Marca, Producto
 class MarcaSerializer(serializers.ModelSerializer):
   class Meta:
     model = Marca
-    fields = '__all__'
+    fields = ['id', 'nom_marca']
 
 class ProductoSerializer(serializers.ModelSerializer):
     
-    marca = serializers.StringRelatedField(many=False) 
+    marca = serializers.PrimaryKeyRelatedField(queryset=Marca.objects.all()) 
 
     class Meta:
         model = Producto
-        fields = ['nombre', 'precio', 'marca']
+        fields = ['nombre', 'precio', 'descripcion', 'marca']
