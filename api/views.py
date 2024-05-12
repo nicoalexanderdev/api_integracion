@@ -63,7 +63,7 @@ def get_productos(request):
 # agregar producto
 @api_view(['POST'])
 def create_producto(request):
-  serializer = ProductoSerializer(data=request.data)
+  serializer = ProductoSerializer(data=request.data, context={'request': request})
   if serializer.is_valid():
     serializer.save()
 
