@@ -15,5 +15,5 @@ class Producto(models.Model):
   imagen_url = models.URLField(default='')
   marca = models.ForeignKey(Marca, on_delete=models.PROTECT)
 
-def __str__(self):
-  return self.nombre
+  def __str__(self):
+    return self.nombre

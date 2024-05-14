@@ -8,8 +8,16 @@ class MarcaSerializer(serializers.ModelSerializer):
 
 class ProductoSerializer(serializers.ModelSerializer):
     
-    marca = serializers.PrimaryKeyRelatedField(queryset=Marca.objects.all()) 
+    marca_nombre = serializers.SerializerMethodField()
 
     class Meta:
         model = Producto
-        fields = ['nombre', 'precio', 'descripcion', 'imagen_url', 'marca']
+        fields = ['id', 'nombre', 'precio', 'descripcion', 'imagen_url', 'marca', 'marca_nombre']
+
+    def get_marca_nombre(self, obj):
+        return obj.marca.nom_marca if obj.marca else None
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Modificar el queryset para incluir los nombres de las marcas
+        self.fields['marca'].queryset = Marca.objects.all()
