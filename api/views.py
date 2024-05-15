@@ -1,7 +1,7 @@
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
-from .serializer import MarcaSerializer, ProductoSerializer
-from .models import Marca, Producto
+from .serializer import MarcaSerializer, CategoriaSerializer, ProductoSerializer
+from .models import Marca, Categoria, Producto
 
 # Create your views here.
 
@@ -51,6 +51,10 @@ def delete_marca(request, pk):
 
   return Response('Marca eliminada')
 
+
+
+
+
 # views productos
 
 # obtener todos los productos
@@ -94,3 +98,25 @@ def delete_producto(request, pk):
   producto.delete()
 
   return Response('Producto eliminado')
+
+
+
+
+  # views de categorias
+
+# obtener todas las categorias
+@api_view(['GET'])
+def get_categorias(request):
+  categorias = Categoria.objects.all()
+  serializer = CategoriaSerializer(categorias, many=True)
+  return Response(serializer.data)
+
+
+# agregar categoria
+@api_view(['POST'])
+def create_categoria(request):
+  serializer = CategoriaSerializer(data=request.data)
+  if serializer.is_valid():
+    serializer.save()
+
+  return Response(serializer.data)
