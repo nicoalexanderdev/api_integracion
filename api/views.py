@@ -120,3 +120,29 @@ def create_categoria(request):
     serializer.save()
 
   return Response(serializer.data)
+
+# actualizar categoria
+@api_view(['PUT'])
+def update_categoria(request, pk):
+  categoria = Categoria.objects.get(id=pk)
+  serializer = CategoriaSerializer(instance=categoria, data=request.data)
+
+  if serializer.is_valid():
+    serializer.save()
+
+  return Response(serializer.data)
+
+# obtener solo una categoria
+@api_view(['GET'])
+def get_categoria(request, pk):
+  categoria = Categoria.objects.get(id=pk)
+  serializer = CategoriaSerializer(categoria, many=False)
+  return Response(serializer.data)
+
+# eliminar categoria
+@api_view(['DELETE'])
+def delete_categoria(request, pk):
+  categoria = Categoria.objects.get(id=pk)
+  categoria.delete()
+
+  return Response('Categoria eliminada')
