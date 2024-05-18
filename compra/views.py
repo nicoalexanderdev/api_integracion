@@ -21,6 +21,7 @@ def headers_request_transbank():
                 } 
   return headers   
 
+
 @api_view(['POST'])
 def transbank_create(request):
     try:
@@ -46,6 +47,7 @@ def transbank_create(request):
         return JsonResponse({'error': 'Error de decodificación JSON: {}'.format(str(e))}, status=500)
 
 
+api_view(['PUT'])
 def transbank_commit(tokenws):
     try:
         print('tokenws: ', tokenws)
