@@ -46,8 +46,29 @@ def transbank_create(request):
         return JsonResponse({'error': 'Error de decodificación JSON: {}'.format(str(e))}, status=500)
 
 
-  
-    
+def transbank_commit(tokenws):
+    try:
+        print('tokenws: ', tokenws)
+        
+        # FORMACIÓN DE LA URL DE TRANSBANK PARA CONFIRMAR UNA TRANSACCIÓN
+        url = f"https://webpay3gint.transbank.cl/rswebpaytransaction/api/webpay/v1.2/transactions/{tokenws}"
+
+        # CABECERA SOLICITADA POR TRANSBANK
+        headers = headers_request_transbank()
+
+        # INVOCACIÓN POR PUT A API REST QUE CONFIRMA UNA TRANSACCIÓN EN TRANSBANK
+        response = requests.put(url, headers=headers)
+        print('response: ', response.json())
+
+        # RETORNO DE LA RESPUESTA DE TRANSBANK
+        return response.json()
+
+    except Exception as e:
+        # Manejar cualquier excepción que pueda ocurrir durante la solicitud a la API de Transbank
+        print(f"Error al confirmar transacción en Transbank: {e}")
+        return {'error': str(e)}
+
+
 @api_view(['POST'])
 def transbank_reverse_or_cancel(request, tokenws):
     try:
