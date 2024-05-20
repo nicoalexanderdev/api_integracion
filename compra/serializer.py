@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from .models import Transaccion
 
-class TransaccionSerializer(serializers.Serializer):
+class TransaccionSerializer(serializers.ModelSerializer):
   class Meta:
     model = Transaccion
     fields = [
