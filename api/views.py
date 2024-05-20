@@ -1,7 +1,9 @@
+from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from .serializer import MarcaSerializer, CategoriaSerializer, ProductoSerializer
 from .models import Marca, Categoria, Producto
+from rest_framework import status
 
 # Create your views here.
 
@@ -99,8 +101,48 @@ def delete_producto(request, pk):
 
   return Response('Producto eliminado')
 
+# filtrar producto por categorias
+@api_view(['GET'])
+def get_productos_categoria(request, pk):
+    try:
+        categoria = get_object_or_404(Categoria, id=pk)
+        productos = Producto.objects.filter(categoria=categoria)
+        if not productos:
+            return Response({'detail': 'No hay productos de esta categoria'}, status=status.HTTP_404_NOT_FOUND)
+        
+        serializer = ProductoSerializer(productos, many=True)
+
+        response_data = {
+          'categoria': categoria.nom_categoria,
+          'productos': serializer.data
+        }
+        return Response(response_data, status=status.HTTP_200_OK)
+    except Producto.DoesNotExist:
+        return Response({'detail': 'Categoria no encontrada'}, status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        return Response({'detail': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
+# filtrar producto por marca
+@api_view(['GET'])
+def get_productos_marca(request, pk):
+    try:
+        marca = get_object_or_404(Marca, id=pk)
+        productos = Producto.objects.filter(marca=marca)
+        if not productos:
+            return Response({'detail': 'No hay productos de esta marca'}, status=status.HTTP_404_NOT_FOUND)
+        
+        serializer = ProductoSerializer(productos, many=True)
+
+        response_data = {
+          'marca': marca.nom_marca,
+          'productos': serializer.data
+        }
+        return Response(response_data, status=status.HTTP_200_OK)
+    except Producto.DoesNotExist:
+        return Response({'detail': 'Marca no encontrada'}, status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        return Response({'detail': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
   # views de categorias
 

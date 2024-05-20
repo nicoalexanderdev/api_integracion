@@ -12,6 +12,8 @@ urlpatterns = [
   path('get-producto/<str:pk>', views.get_producto),
   path('update-producto/<str:pk>', views.update_producto),
   path('delete-producto/<str:pk>', views.delete_producto),
+  path('get-productos-categoria/<str:pk>', views.get_productos_categoria),
+  path('get-productos-marca/<str:pk>', views.get_productos_marca),
   path('create-categoria', views.create_categoria),
   path('get-categorias', views.get_categorias),
   path('update-categoria/<str:pk>', views.update_categoria),
