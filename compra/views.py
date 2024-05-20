@@ -4,9 +4,13 @@ from django.http import JsonResponse
 import requests
 import json
 from django.views.decorators.csrf import csrf_exempt
+
+from djangoconfig import settings
 from .serializer import TransaccionSerializer
 from rest_framework.response import Response
 from rest_framework import status
+
+from datetime import date
 
 # Create your views here.
 
@@ -155,3 +159,45 @@ def transaction_save(request):
         serializer.save()
         return Response({'transaction': serializer.data}, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['GET'])
+def get_dollar_value(request):
+    try:
+        user = 'ni.oses@duocuc.cl'
+        password = 'Chafaternico97.'
+        timeseries = 'F073.TCO.PRE.Z.D'
+        firstdate = '2024-05-19'
+        lastdate = date.today().strftime('%Y-%m-%d')
+
+        url = f'{settings.API_BCN_CENTRAL}user={user}&pass={password}&timeseries={timeseries}&firstdate={firstdate}&lastdate={lastdate}'
+
+        response = requests.get(url)
+        response.raise_for_status()
+        dolar = response.json()
+
+        # Obtener el valor del día actual
+        today_value = None
+        for obs in dolar.get('Series', {}).get('Obs', []):
+            if obs.get('indexDateString') == lastdate:
+                value = obs.get('value')
+                if value and value.lower() != 'nan':
+                    today_value = value
+                    break
+
+        # Si el valor del día actual es NaN, buscar el último valor no NaN en las observaciones
+        if today_value is None or today_value.lower() == 'nan':
+            observations = dolar.get('Series', {}).get('Obs', [])
+            for obs in reversed(observations):
+                value = obs.get('value')
+                if value and value.lower() != 'nan':
+                    today_value = value
+                    break
+
+        if today_value is None or today_value.lower() == 'nan':
+            raise ValueError("No se encontró un valor válido para el dólar.")
+
+        return Response({'value': today_value})
+    except Exception as e:
+        print(f"Error al obtener valor del dolar: {e}")
+        return JsonResponse({'error': str(e)}, status=500)

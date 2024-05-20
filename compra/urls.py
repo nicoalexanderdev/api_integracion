@@ -8,4 +8,5 @@ urlpatterns = [
   path('get-status/<str:tokenws>/', views.transbank_get_status),
   path('transbank-capture/<str:tokenws>', views.transbank_capture),
   path('transaction-save/', views.transaction_save),
+  path('get-dollar-value', views.get_dollar_value)
 ]

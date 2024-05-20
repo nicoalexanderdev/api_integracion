@@ -73,6 +73,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'djangoconfig.wsgi.application'
+API_BCN_CENTRAL = 'https://si3.bcentral.cl/SieteRestWS/SieteRestWS.ashx?'
 
 
 # Database
