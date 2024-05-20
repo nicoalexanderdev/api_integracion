@@ -4,6 +4,9 @@ from django.http import JsonResponse
 import requests
 import json
 from django.views.decorators.csrf import csrf_exempt
+from .serializer import TransaccionSerializer
+from rest_framework.response import Response
+from rest_framework import status
 
 # Create your views here.
 
@@ -143,3 +146,12 @@ def transbank_capture(request, tokenws):
         # Manejar cualquier excepción que pueda ocurrir durante la solicitud a la API de Transbank
         print(f"Error al confirmar transacción en Transbank: {e}")
         return JsonResponse({'error': str(e)}, status=500)
+
+
+@api_view(['POST'])
+def transaction_save(request):
+    serializer = TransaccionSerializer(data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response({'transaction': serializer.data}, status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
