@@ -1,0 +1,434 @@
+openapi: 3.0.3
+info:
+  title: API Integración
+  version: 1.0.0
+  description: La siguiente API contiene las funciones para gestionar los productos
+    y los usuarios. Además de gestionar la pasarela de pago de webpay y de poder obtener
+    el valor del dolar actualizado desde la api del banco central
+paths:
+  /accounts/login:
+    post:
+      operationId: accounts_login_create
+      tags:
+      - accounts
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /accounts/profile:
+    post:
+      operationId: accounts_profile_create
+      tags:
+      - accounts
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          description: No response body
+  /accounts/register:
+    post:
+      operationId: accounts_register_create
+      tags:
+      - accounts
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/productos/:
+    get:
+      operationId: api_productos_retrieve
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/productos/create-categoria:
+    post:
+      operationId: api_productos_create_categoria_create
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/productos/create-marca:
+    post:
+      operationId: api_productos_create_marca_create
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/productos/create-producto:
+    post:
+      operationId: api_productos_create_producto_create
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/productos/delete-categoria/{id}:
+    delete:
+      operationId: api_productos_delete_categoria_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '204':
+          description: No response body
+  /api/productos/delete-marca/{id}:
+    delete:
+      operationId: api_productos_delete_marca_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '204':
+          description: No response body
+  /api/productos/delete-producto/{id}:
+    delete:
+      operationId: api_productos_delete_producto_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '204':
+          description: No response body
+  /api/productos/get-categoria/{id}:
+    get:
+      operationId: api_productos_get_categoria_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/productos/get-categorias:
+    get:
+      operationId: api_productos_get_categorias_retrieve
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/productos/get-marca/{id}:
+    get:
+      operationId: api_productos_get_marca_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/productos/get-marcas:
+    get:
+      operationId: api_productos_get_marcas_retrieve
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/productos/get-producto/{id}:
+    get:
+      operationId: api_productos_get_producto_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/productos/get-productos-categoria/{id}:
+    get:
+      operationId: api_productos_get_productos_categoria_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/productos/get-productos-marca/{id}:
+    get:
+      operationId: api_productos_get_productos_marca_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/productos/update-categoria/{id}:
+    put:
+      operationId: api_productos_update_categoria_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/productos/update-marca/{id}:
+    put:
+      operationId: api_productos_update_marca_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/productos/update-producto/{id}:
+    put:
+      operationId: api_productos_update_producto_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/v1/transbank/commit/{tokenws}:
+    put:
+      operationId: api_v1_transbank_commit_update
+      parameters:
+      - in: path
+        name: tokenws
+        schema:
+          type: string
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/v1/transbank/get-dollar-value:
+    get:
+      operationId: api_v1_transbank_get_dollar_value_retrieve
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/v1/transbank/get-status/{tokenws}/:
+    get:
+      operationId: api_v1_transbank_get_status_retrieve
+      parameters:
+      - in: path
+        name: tokenws
+        schema:
+          type: string
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/v1/transbank/transaction-save/:
+    post:
+      operationId: api_v1_transbank_transaction_save_create
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/v1/transbank/transaction/create/:
+    post:
+      operationId: api_v1_transbank_transaction_create_create
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/v1/transbank/transaction/reverse-or-cancel/{tokenws}:
+    post:
+      operationId: api_v1_transbank_transaction_reverse_or_cancel_create
+      parameters:
+      - in: path
+        name: tokenws
+        schema:
+          type: string
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/v1/transbank/transbank-capture/{tokenws}:
+    put:
+      operationId: api_v1_transbank_transbank_capture_update
+      parameters:
+      - in: path
+        name: tokenws
+        schema:
+          type: string
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+components:
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: sessionid
+    tokenAuth:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: Token-based authentication with required prefix "Token"
