@@ -20,7 +20,7 @@ from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/productos/', include('api.urls')),
-    path('accounts/', include('user.urls')),
+    path('api/accounts/', include('user.urls')),
     path('api/v1/transbank/', include('compra.urls')),
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
     path('api/schema/docs/', SpectacularSwaggerView.as_view(url_name='schema'))
