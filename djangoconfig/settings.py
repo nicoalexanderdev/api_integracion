@@ -75,6 +75,8 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'djangoconfig.wsgi.application'
 API_BCN_CENTRAL = 'https://si3.bcentral.cl/SieteRestWS/SieteRestWS.ashx?'
+PASS_BCN = 'Chafaternico97.'
+USER_BCN = 'ni.oses@duocuc.cl'
 
 
 # Database
@@ -90,6 +92,7 @@ DATABASES = {
         'PORT': '5432',
     }
 }
+
 
 
 # Password validation

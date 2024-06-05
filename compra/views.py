@@ -164,8 +164,8 @@ def transaction_save(request):
 @api_view(['GET'])
 def get_dollar_value(request):
     try:
-        user = 'ni.oses@duocuc.cl'
-        password = 'Chafaternico97.'
+        user = settings.USER_BCN
+        password = settings.PASS_BCN
         timeseries = 'F073.TCO.PRE.Z.D'
         firstdate = '2024-05-19'
         lastdate = date.today().strftime('%Y-%m-%d')
