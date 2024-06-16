@@ -15,10 +15,11 @@ class ProductoSerializer(serializers.ModelSerializer):
     
     marca_nombre = serializers.SerializerMethodField()
     nom_categoria = serializers.SerializerMethodField()
+    image_url = serializers.ImageField(required=False)
 
     class Meta:
         model = Producto
-        fields = ['id', 'nombre', 'precio', 'descripcion', 'imagen_url', 'stock', 'marca', 'marca_nombre', 'categoria', 'nom_categoria']
+        fields = ['id', 'nombre', 'precio', 'descripcion', 'image_url', 'stock', 'marca', 'marca_nombre', 'categoria', 'nom_categoria']
 
     def get_marca_nombre(self, obj):
         return obj.marca.nom_marca if obj.marca else None

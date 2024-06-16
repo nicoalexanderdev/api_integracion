@@ -4,6 +4,7 @@ from rest_framework.decorators import api_view
 from .serializer import MarcaSerializer, CategoriaSerializer, ProductoSerializer
 from .models import Marca, Categoria, Producto
 from rest_framework import status
+from rest_framework.parsers import MultiPartParser, FormParser
 
 # Create your views here.
 
@@ -69,6 +70,7 @@ def get_productos(request):
 # agregar producto
 @api_view(['POST'])
 def create_producto(request):
+  parser_classes = (MultiPartParser, FormParser)
   serializer = ProductoSerializer(data=request.data, context={'request': request})
   if serializer.is_valid():
     serializer.save()

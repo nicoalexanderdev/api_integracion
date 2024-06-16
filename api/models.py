@@ -3,6 +3,9 @@ from django.db import models
 
 # Create your models here.
 
+def upload_to(instance, filename):
+    return 'images/{filename}'.format(filename=filename)
+
 class Categoria(models.Model):
   nom_categoria = models.CharField(max_length=80)
 
@@ -19,7 +22,7 @@ class Producto(models.Model):
   nombre = models.CharField(max_length=100)
   precio = models.IntegerField()
   descripcion = models.TextField()
-  imagen_url = models.URLField(default='')
+  image_url = models.ImageField(upload_to=upload_to, blank=True, null=True)
   stock = models.IntegerField(default=0)
   marca = models.ForeignKey(Marca, on_delete=models.PROTECT)
   categoria = models.ForeignKey(Categoria, on_delete=models.PROTECT, null=True)
