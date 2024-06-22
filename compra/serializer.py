@@ -1,5 +1,10 @@
 from rest_framework import serializers
-from .models import Transaccion
+from .models import Transaccion, Direccion
+
+class DireccionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Direccion
+        fields = ('id', 'user', 'direccion', 'num_direccion', 'descripcion', 'region', 'comuna')
 
 class TransaccionSerializer(serializers.ModelSerializer):
   class Meta:

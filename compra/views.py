@@ -6,7 +6,7 @@ import json
 from django.views.decorators.csrf import csrf_exempt
 
 from djangoconfig import settings
-from .serializer import TransaccionSerializer
+from .serializer import TransaccionSerializer, DireccionSerializer
 from rest_framework.response import Response
 from rest_framework import status
 
@@ -14,6 +14,13 @@ from datetime import date
 
 # Create your views here.
 
+@api_view(['POST'])
+def agregar_direccion(request):
+    serializer = DireccionSerializer(data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 def headers_request_transbank():
     headers = {  # DEFINICIÓN TIPO DE AUTORIZACIÓN Y AUTENTICACIÓN

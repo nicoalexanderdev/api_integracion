@@ -3,6 +3,17 @@ from django.contrib.auth.models import User
 
 # Create your models here.request
 
+class Direccion(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='direcciones')
+    direccion = models.CharField(max_length=100)
+    num_direccion = models.IntegerField()
+    descripcion = models.IntegerField(null=True)
+    region = models.CharField(max_length=100)
+    comuna = models.CharField(max_length=100)
+
+    def __str__(self):
+        return f'{self.direccion} {self.num_direccion}'
+
 class Transaccion(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     buy_order = models.CharField(max_length=50)
