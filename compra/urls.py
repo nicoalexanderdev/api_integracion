@@ -9,5 +9,9 @@ urlpatterns = [
   path('transbank-capture/<str:tokenws>', views.transbank_capture),
   path('transaction-save/', views.transaction_save),
   path('get-dollar-value', views.get_dollar_value),
-  path('agregar-direccion/', views.agregar_direccion)
+  path('agregar-direccion/', views.agregar_direccion),
+  path('region/', views.region),
+  path('provincia/<str:id>/', views.provincia),
+  path('comuna/<str:id>/', views.comuna),
+  path('direccion/<str:id>/', views.direccion)
 ]

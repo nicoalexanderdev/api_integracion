@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, render
 from rest_framework.decorators import api_view
 from django.http import JsonResponse
 import requests
@@ -6,21 +6,63 @@ import json
 from django.views.decorators.csrf import csrf_exempt
 
 from djangoconfig import settings
-from .serializer import TransaccionSerializer, DireccionSerializer
+from .serializer import ProvinciaSerializer, TransaccionSerializer, DireccionSerializer, RegionSerializer, ComunaSerializer, DireccionCreateSerializer
 from rest_framework.response import Response
 from rest_framework import status
-
+from .models import Region, Provincia, Comuna, Direccion
 from datetime import date
+from django.contrib.auth.models import User
 
 # Create your views here.
 
+@api_view(['GET'])
+def comuna(request, id):
+    try:
+        provincia = get_object_or_404(Provincia, id=id)
+        comunas = Comuna.objects.filter(provincia=provincia)
+        serializer = ComunaSerializer(comunas, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response({'detail': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+@api_view(['GET'])
+def provincia(request, id):
+    try:
+        region = get_object_or_404(Region, id=id)
+        provincias = Provincia.objects.filter(region=region)
+        serializer = ProvinciaSerializer(provincias, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response({'detail': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+@api_view(['GET'])
+def region(request):
+    regiones = Region.objects.all()
+    serializer = RegionSerializer(regiones, many=True)
+    return Response(serializer.data)
+
+@api_view(['GET'])
+def direccion(request, id):
+    try:
+        user = get_object_or_404(User, id=id)
+        direcciones = Direccion.objects.filter(user=user)
+        serializer = DireccionSerializer(direcciones, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response({'detail': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+
 @api_view(['POST'])
 def agregar_direccion(request):
-    serializer = DireccionSerializer(data=request.data)
-    if serializer.is_valid():
-        serializer.save()
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    try:
+        serializer = DireccionCreateSerializer(data=request.data)
+        if serializer.is_valid():
+            direccion = serializer.save()
+            return Response(DireccionSerializer(direccion).data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        return Response({'detail': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 def headers_request_transbank():
     headers = {  # DEFINICIÓN TIPO DE AUTORIZACIÓN Y AUTENTICACIÓN

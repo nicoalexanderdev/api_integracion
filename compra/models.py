@@ -3,16 +3,43 @@ from django.contrib.auth.models import User
 
 # Create your models here.request
 
+class Region(models.Model):
+    nom_region = models.CharField(max_length=100, unique=True)
+
+    def __str__(self):
+        return self.nom_region
+
+
+class Provincia(models.Model):
+    nom_provincia = models.CharField(max_length=100)
+    region = models.ForeignKey(Region, on_delete=models.CASCADE, related_name='provincias')
+
+    class Meta:
+        unique_together = ('nom_provincia', 'region')
+
+    def __str__(self):
+        return self.nom_provincia
+
+
+class Comuna(models.Model):
+    nom_comuna = models.CharField(max_length=100)
+    provincia = models.ForeignKey(Provincia, on_delete=models.CASCADE, related_name='comunas')
+
+    class Meta:
+        unique_together = ('nom_comuna', 'provincia')
+
+    def __str__(self):
+        return self.nom_comuna
+
 class Direccion(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='direcciones')
     direccion = models.CharField(max_length=100)
     num_direccion = models.IntegerField()
     descripcion = models.IntegerField(null=True)
-    region = models.CharField(max_length=100)
-    comuna = models.CharField(max_length=100)
+    comuna = models.ForeignKey(Comuna, on_delete=models.CASCADE, related_name='direcciones')
 
     def __str__(self):
-        return f'{self.direccion} {self.num_direccion}'
+        return f'{self.direccion} {self.num_direccion}, {self.comuna.nom_comuna}, {self.comuna.provincia.nom_provincia}, {self.comuna.provincia.region.nom_region}'
 
 class Transaccion(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
