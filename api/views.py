@@ -1,7 +1,7 @@
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
-from .serializer import MarcaSerializer, CategoriaSerializer, ProductoSerializer
+from .serializer import MarcaSerializer, CategoriaSerializer, ProductoSerializer, ProductoCreateSerializer
 from .models import Marca, Categoria, Producto
 from rest_framework import status
 from rest_framework.parsers import MultiPartParser, FormParser
@@ -71,7 +71,7 @@ def get_productos(request):
 @api_view(['POST'])
 def create_producto(request):
   parser_classes = (MultiPartParser, FormParser)
-  serializer = ProductoSerializer(data=request.data, context={'request': request})
+  serializer = ProductoCreateSerializer(data=request.data, context={'request': request})
   if serializer.is_valid():
     serializer.save()
 
