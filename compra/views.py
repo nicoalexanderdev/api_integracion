@@ -232,7 +232,6 @@ def get_dollar_value(request):
         response.raise_for_status()
         dolar = response.json()
 
-        print(dolar)
 
         # Obtener el valor del día actual
         today_value = None
