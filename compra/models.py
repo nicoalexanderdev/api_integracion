@@ -41,6 +41,15 @@ class Direccion(models.Model):
     def __str__(self):
         return f'{self.direccion} {self.num_direccion}, {self.comuna.nom_comuna}, {self.comuna.provincia.nom_provincia}, {self.comuna.provincia.region.nom_region}'
 
+class Sucursal(models.Model):
+    nom_sucursal = models.CharField(max_length=80)
+    direccion = models.CharField(max_length=100)
+    num_direccion = models.IntegerField()
+    comuna = models.ForeignKey(Comuna, on_delete=models.CASCADE, related_name='sucursales')
+
+    def __str__(self):
+        return self.nom_sucursal
+
 class Transaccion(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     buy_order = models.CharField(max_length=50)

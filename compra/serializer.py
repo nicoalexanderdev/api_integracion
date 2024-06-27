@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Transaccion, Direccion, Region, Provincia, Comuna
+from .models import Transaccion, Direccion, Region, Provincia, Comuna, Sucursal
 
 class RegionSerializer(serializers.ModelSerializer):
    class Meta:
@@ -37,6 +37,16 @@ class DireccionCreateSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         return Direccion.objects.create(**validated_data)
+
+
+class SucursalSerializer(serializers.ModelSerializer):
+   
+  comuna = ComunaSerializer()
+
+  class Meta:
+      model = Sucursal
+      fields = ('id', 'nom_sucursal', 'direccion', 'num_direccion', 'comuna')
+   
 
 
 class TransaccionSerializer(serializers.ModelSerializer):

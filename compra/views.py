@@ -6,14 +6,21 @@ import json
 from django.views.decorators.csrf import csrf_exempt
 
 from djangoconfig import settings
-from .serializer import ProvinciaSerializer, TransaccionSerializer, DireccionSerializer, RegionSerializer, ComunaSerializer, DireccionCreateSerializer
+from .serializer import ProvinciaSerializer, TransaccionSerializer, DireccionSerializer, RegionSerializer, ComunaSerializer, DireccionCreateSerializer, SucursalSerializer
 from rest_framework.response import Response
 from rest_framework import status
-from .models import Region, Provincia, Comuna, Direccion
+from .models import Region, Provincia, Comuna, Direccion, Sucursal
 from datetime import date
 from django.contrib.auth.models import User
 
 # Create your views here.
+
+@api_view(['GET'])
+def sucursal(request):
+    sucursales =Sucursal.objects.all()
+    serializer = SucursalSerializer(sucursales, many=True)
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
 
 @api_view(['GET'])
 def comuna(request, id):

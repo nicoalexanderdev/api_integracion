@@ -13,5 +13,6 @@ urlpatterns = [
   path('region/', views.region),
   path('provincia/<str:id>/', views.provincia),
   path('comuna/<str:id>/', views.comuna),
-  path('direccion/<str:id>/', views.direccion)
+  path('direccion/<str:id>/', views.direccion),
+  path('sucursales/', views.sucursal)
 ]
