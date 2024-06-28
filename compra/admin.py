@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Transaccion, Region, Provincia, Comuna, Direccion, Sucursal, Carro, CarroItem, Order, OrderItem
+from .models import Transaccion, Region, Provincia, Comuna, Direccion, Sucursal, Carro, CarroItem, Order, OrderItem, Estado
 
 # Register your models here.
 
@@ -13,3 +13,4 @@ admin.site.register(Carro)
 admin.site.register(CarroItem)
 admin.site.register(Order)
 admin.site.register(OrderItem)
+admin.site.register(Estado)

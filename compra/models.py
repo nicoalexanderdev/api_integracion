@@ -80,32 +80,6 @@ class CarroItem(models.Model):
         return self.producto.precio * self.cantidad
     
     
-class Order(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    subtotal = models.PositiveBigIntegerField()
-    costo_despacho = models.PositiveIntegerField()
-    total = models.PositiveIntegerField()
-    tipo_entrega = models.CharField(max_length=10)
-    direccion = models.TextField()
-    fecha_entrega = models.DateField()
-    correo = models.CharField(max_length=80)
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return f"Orden #{self.id} de {self.user.username}"
-    
-    
-class OrderItem(models.Model):
-    order = models.ForeignKey(Order, related_name='items', on_delete=models.CASCADE)
-    producto = models.ForeignKey(Producto, on_delete=models.CASCADE)
-    cantidad = models.PositiveIntegerField(default=1)
-
-    def __str__(self):
-        return f"{self.cantidad} de {self.producto.nombre} de la orden #{self.order.id}"
-
-    def total_item(self):
-        return self.producto.precio * self.cantidad
-
 
 class Transaccion(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -123,3 +97,40 @@ class Transaccion(models.Model):
 
     def __str__(self):
         return f'Transaccion {self.buy_order} - {self.status}'
+
+
+
+class Estado(models.Model):
+    nom_estado = models.CharField(max_length=30)
+
+    def __str__(self):
+        return f'Estado {self.nom_estado}'
+
+
+class Order(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    subtotal = models.PositiveBigIntegerField()
+    costo_despacho = models.PositiveIntegerField()
+    total = models.PositiveIntegerField()
+    tipo_entrega = models.CharField(max_length=10)
+    direccion = models.TextField()
+    fecha_entrega = models.DateField()
+    correo = models.CharField(max_length=80)
+    created_at = models.DateTimeField(auto_now_add=True)
+    transaccion = models.ForeignKey(Transaccion, on_delete=models.CASCADE, null=True)
+    estado = models.ForeignKey(Estado, on_delete=models.CASCADE, default=1)
+
+    def __str__(self):
+        return f"Orden #{self.id} de {self.user.username}"
+    
+    
+class OrderItem(models.Model):
+    order = models.ForeignKey(Order, related_name='items', on_delete=models.CASCADE)
+    producto = models.ForeignKey(Producto, on_delete=models.CASCADE)
+    cantidad = models.PositiveIntegerField(default=1)
+
+    def __str__(self):
+        return f"{self.cantidad} de {self.producto.nombre} de la orden #{self.order.id}"
+
+    def total_item(self):
+        return self.producto.precio * self.cantidad

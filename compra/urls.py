@@ -15,9 +15,7 @@ urlpatterns = [
   path('comuna/<str:id>/', views.comuna),
   path('direccion/<str:id>/', views.direccion),
   path('sucursales/', views.sucursal),
-  path('listar-carro/', views.listar_carro),
-  path('agregar-producto-carro/', views.agregar_producto_carro),
-  path('crear-carro/', views.crear_carro),
   path('crear-orden-compra/', views.crear_orden_compra),
   path('order-items/', views.order_items),
+  path('buy-orders/', views.buy_orders),
 ]
