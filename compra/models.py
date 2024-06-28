@@ -1,6 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import User
 
+from api.models import Producto
+
 # Create your models here.request
 
 class Region(models.Model):
@@ -49,6 +51,61 @@ class Sucursal(models.Model):
 
     def __str__(self):
         return self.nom_sucursal
+    
+
+class Carro(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Carro de {self.user.username}"
+
+    def subtotal_carro(self):
+        return sum(item.subtotal_item() for item in self.items.all())
+
+    def total_items(self):
+        return sum(item.cantidad for item in self.items.all())
+    
+
+class CarroItem(models.Model):
+    carro = models.ForeignKey(Carro, related_name='items', on_delete=models.CASCADE)
+    producto = models.ForeignKey(Producto, on_delete=models.CASCADE)
+    cantidad = models.PositiveIntegerField(default=1)
+    added_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.cantidad} de {self.producto.nombre}"
+
+    def subtotal_item(self):
+        return self.producto.precio * self.cantidad
+    
+    
+class Order(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    subtotal = models.PositiveBigIntegerField()
+    costo_despacho = models.PositiveIntegerField()
+    total = models.PositiveIntegerField()
+    tipo_entrega = models.CharField(max_length=10)
+    direccion = models.TextField()
+    fecha_entrega = models.DateField()
+    correo = models.CharField(max_length=80)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Orden #{self.id} de {self.user.username}"
+    
+    
+class OrderItem(models.Model):
+    order = models.ForeignKey(Order, related_name='items', on_delete=models.CASCADE)
+    producto = models.ForeignKey(Producto, on_delete=models.CASCADE)
+    cantidad = models.PositiveIntegerField(default=1)
+
+    def __str__(self):
+        return f"{self.cantidad} de {self.producto.nombre} de la orden #{self.order.id}"
+
+    def total_item(self):
+        return self.producto.precio * self.cantidad
+
 
 class Transaccion(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)

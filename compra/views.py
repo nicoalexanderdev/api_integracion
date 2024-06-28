@@ -6,14 +6,105 @@ import json
 from django.views.decorators.csrf import csrf_exempt
 
 from djangoconfig import settings
-from .serializer import ProvinciaSerializer, TransaccionSerializer, DireccionSerializer, RegionSerializer, ComunaSerializer, DireccionCreateSerializer, SucursalSerializer
+from .serializer import OrderItemSerializerCreate, ProvinciaSerializer, TransaccionSerializer, DireccionSerializer, RegionSerializer, ComunaSerializer, DireccionCreateSerializer, SucursalSerializer, CarroSerializer, CarroItemSerializer, OrderSerializer, OrderItemSerializer
 from rest_framework.response import Response
 from rest_framework import status
-from .models import Region, Provincia, Comuna, Direccion, Sucursal
+from .models import Region, Provincia, Comuna, Direccion, Sucursal, Carro, CarroItem, Order, OrderItem
 from datetime import date
 from django.contrib.auth.models import User
+from api.models import Producto
 
 # Create your views here.
+
+@api_view(['POST'])
+def order_items(request):
+    if isinstance(request.data, list):
+        serializer = OrderItemSerializer(data=request.data, many=True, context={'request': request})
+    else:
+        serializer = OrderItemSerializer(data=request.data, context={'request': request})
+
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['POST'])
+def crear_orden_compra(request):
+    serializer = OrderSerializer(data=request.data, context={'request': request})
+    if serializer.is_valid():
+        serializer.save()
+
+    return Response(serializer.data)
+
+
+@api_view(['POST'])
+def crear_carro(request):
+    print(request.user)
+    try:
+
+        # Verifica si el usuario ya tiene un carro creado
+        carro_existente = Carro.objects.filter(user=request.user).exists()
+        
+        if carro_existente:
+            return Response({"detail": "El usuario ya tiene un carro creado."}, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Crea un nuevo carro para el usuario actual
+        nuevo_carro = Carro.objects.create(user=request.user)
+        
+        # Serializa el carro creado para devolverlo en la respuesta
+        serializer = CarroSerializer(nuevo_carro)
+        
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    
+    except Exception as e:
+        return Response({"detail": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['POST'])
+def agregar_producto_carro(request):
+    user = request.user
+    data = request.data  # Obtener los datos enviados en la solicitud
+
+    print(user)
+
+    productos = data.get('productos', [])
+
+    if not isinstance(productos, list):
+        return Response({"error": "La lista de productos debe ser un arreglo"}, status=status.HTTP_400_BAD_REQUEST)
+
+    for producto_data in productos:
+        producto_id = producto_data.get('producto_id')
+        cantidad = producto_data.get('cantidad', 1)
+
+        if not producto_id:
+            return Response({"error": "producto_id es requerido"}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            producto = Producto.objects.get(id=producto_id)
+        except Producto.DoesNotExist:
+            return Response({"error": f"Producto con ID {producto_id} no encontrado"}, status=status.HTTP_404_NOT_FOUND)
+
+        carro, created = Carro.objects.get_or_create(user=user)
+
+        carro_item, created = CarroItem.objects.get_or_create(carro=carro, producto=producto)
+        if not created:
+            carro_item.cantidad += int(cantidad)
+        else:
+            carro_item.cantidad = int(cantidad)
+        carro_item.save()
+
+    # Opcional: devolver una respuesta indicando que se agregaron los productos correctamente
+    return Response({"message": "Productos agregados al carrito correctamente"}, status=status.HTTP_201_CREATED)
+
+
+@api_view(['GET'])
+def listar_carro(request):
+    try:
+        carro = Carro.objects.get(user=request.user)
+        serializer = CarroSerializer(carro)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    except Carro.DoesNotExist:
+        return Response({"error": "Carro no encontrado"}, status=status.HTTP_404_NOT_FOUND)
 
 @api_view(['GET'])
 def sucursal(request):
