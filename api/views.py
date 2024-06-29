@@ -70,12 +70,12 @@ def get_productos(request):
 # agregar producto
 @api_view(['POST'])
 def create_producto(request):
-  parser_classes = (MultiPartParser, FormParser)
-  serializer = ProductoCreateSerializer(data=request.data, context={'request': request})
-  if serializer.is_valid():
-    serializer.save()
-
-  return Response(serializer.data)
+    parser_classes = (MultiPartParser, FormParser)
+    serializer = ProductoCreateSerializer(data=request.data, context={'request': request})
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 # obtener solo un producto
 @api_view(['GET'])
