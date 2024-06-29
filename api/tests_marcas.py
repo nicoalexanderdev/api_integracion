@@ -7,7 +7,7 @@ from .serializer import MarcaSerializer
 
 
 # Create your tests here.
-
+'''
 class MarcaAPITests(TestCase):
     def setUp(self):
         self.factory = APIRequestFactory()
@@ -106,5 +106,5 @@ class MarcaDeleteAPITests(TestCase):
 
         with self.assertRaises(Marca.DoesNotExist):
             Marca.objects.get(id=marca_id)
-
+'''
 

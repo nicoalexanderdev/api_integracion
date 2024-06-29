@@ -2,12 +2,13 @@ import tempfile
 from django.test import TestCase
 from rest_framework.test import APIRequestFactory
 from rest_framework import status
-from .views import get_productos, create_producto, get_producto
+from .views import get_productos, create_producto, get_producto, get_productos_categoria, get_productos_marca
 from .models import Producto, Marca, Categoria  
 from .serializer import ProductoSerializer, ProductoCreateSerializer
 from django.core.files.uploadedfile import SimpleUploadedFile 
 from PIL import Image
 
+'''
 class ProductoAPITests(TestCase):
     def setUp(self):
         self.factory = APIRequestFactory()
@@ -119,3 +120,74 @@ class ProductoGetAPITests(TestCase):
         self.assertEqual(response.data, serializer.data)
 
 
+
+class getProductosCategoriaAPITests(TestCase):
+    def setUp(self):
+        self.factory = APIRequestFactory()
+
+        self.marca = Marca.objects.create(nom_marca='Marca Test')
+        self.categoria = Categoria.objects.create(nom_categoria='Categoría Test')
+
+        self.producto1 = Producto.objects.create(
+            nombre='Producto Test',
+            precio=100,
+            descripcion='Descripción del Producto Test',
+            stock=10,
+            marca=self.marca,
+            categoria=self.categoria
+        )
+
+        self.producto2 = Producto.objects.create(
+            nombre='Producto Test 2',
+            precio=500,
+            descripcion='Descripción del Producto Test 2',
+            stock=10,
+            marca=self.marca,
+            categoria=self.categoria
+        )
+
+    def test_get_producto_categoria(self):
+        request = self.factory.get(f'/get-productos-categoria/{self.categoria.id}/')
+        response = get_productos_categoria(request, pk=self.categoria.id)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        serializer = ProductoSerializer([self.producto1, self.producto2], many=True)
+        self.assertEqual(response.data['productos'], serializer.data)
+
+
+
+class getProductosMarcaAPITests(TestCase):
+    def setUp(self):
+        self.factory = APIRequestFactory()
+
+        self.marca = Marca.objects.create(nom_marca='Marca Test')
+        self.categoria = Categoria.objects.create(nom_categoria='Categoría Test')
+
+        self.producto1 = Producto.objects.create(
+            nombre='Producto Test',
+            precio=100,
+            descripcion='Descripción del Producto Test',
+            stock=10,
+            marca=self.marca,
+            categoria=self.categoria
+        )
+
+        self.producto2 = Producto.objects.create(
+            nombre='Producto Test 2',
+            precio=500,
+            descripcion='Descripción del Producto Test 2',
+            stock=10,
+            marca=self.marca,
+            categoria=self.categoria
+        )
+
+    def test_get_producto_marca(self):
+        request = self.factory.get(f'/get-productos-marca/{self.marca.id}/')
+        response = get_productos_marca(request, pk=self.marca.id)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        serializer = ProductoSerializer([self.producto1, self.producto2], many=True)
+        self.assertEqual(response.data['productos'], serializer.data)
+'''

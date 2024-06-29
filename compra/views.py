@@ -40,7 +40,7 @@ def crear_orden_compra(request):
     serializer = OrderSerializer(data=request.data)
     if serializer.is_valid():
         serializer.save()
-        return Response(serializer.data, status=status.HTTP_201_CREATED)  # Return 201 Created on success
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -73,10 +73,13 @@ def provincia(request, id):
 
 @api_view(['GET'])
 def region(request):
-    regiones = Region.objects.all()
-    serializer = RegionSerializer(regiones, many=True)
-    return Response(serializer.data)
-
+    try:
+        regiones = Region.objects.all()
+        serializer = RegionSerializer(regiones, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response({'detail': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
 @api_view(['GET'])
 def direccion(request, id):
     try:
@@ -96,7 +99,7 @@ def agregar_direccion(request):
         serializer = DireccionCreateSerializer(data=request.data)
         if serializer.is_valid():
             direccion = serializer.save()
-            return Response(DireccionSerializer(direccion).data, status=status.HTTP_201_CREATED)
+            return Response(DireccionCreateSerializer(direccion).data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     except Exception as e:
         return Response({'detail': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

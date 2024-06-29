@@ -37,7 +37,7 @@ class Direccion(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='direcciones')
     direccion = models.CharField(max_length=100)
     num_direccion = models.IntegerField()
-    descripcion = models.IntegerField(null=True)
+    descripcion = models.CharField(max_length=255, blank=True, null=True)
     comuna = models.ForeignKey(Comuna, on_delete=models.CASCADE, related_name='direcciones')
 
     def __str__(self):
