@@ -2,17 +2,16 @@
 from django.test import TestCase
 from rest_framework.test import APIRequestFactory
 from rest_framework import status
-from .views import region, provincia, comuna, sucursal, direccion, agregar_direccion, crear_orden_compra, order_items, transbank_create
-from .models import Region, Provincia, Comuna, Direccion, Sucursal, Transaccion, Estado, Order, OrderItem
-from .serializer import RegionSerializer, ProvinciaSerializer, ComunaSerializer, DireccionSerializer, DireccionCreateSerializer, SucursalSerializer, TransaccionSerializer, OrderItemSerializer, OrderSerializer 
-from django.urls import reverse
+from .views import region, provincia, direccion, agregar_direccion, crear_orden_compra, order_items, transbank_create, transbank_commit
+from .models import Region, Provincia, Comuna, Direccion, Transaccion, Estado, Order
+from .serializer import ProvinciaSerializer, DireccionCreateSerializer, OrderSerializer 
 from django.contrib.auth.models import User
 from api.models import Producto, Marca, Categoria
-from api.serializer import ProductoSerializer, ProductoCreateSerializer
 import json
+import responses
 
 # Create your tests here.
-'''
+
 class RegionGetAPITests(TestCase):
     def setUp(self):
         self.factory = APIRequestFactory()
@@ -57,10 +56,10 @@ class ProvinciaGetAPITests(TestCase):
         response = provincia(request, id=999)
 
         self.assertEqual(response.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
-'''
 
 
-'''
+
+
 class OrdenCompraCreate(TestCase):
     def setUp(self):
         self.factory = APIRequestFactory()
@@ -110,10 +109,10 @@ class OrdenCompraCreate(TestCase):
         serializer_data = serializer.data
 
         self.assertEqual(response_data, serializer_data)
-'''
 
 
-'''
+
+
 class AgregarDireccionTest(TestCase):
     def setUp(self):
         self.factory = APIRequestFactory()
@@ -197,156 +196,151 @@ class ObtenerDireccionUsuarioTest(TestCase):
         ]
 
         self.assertEqual(response.data, expected_data)
-'''
 
 
-'''
-class OrderItemsTestCase(TestCase):
+
+
+class OrderItemAPITests(TestCase):
     def setUp(self):
         self.factory = APIRequestFactory()
-
-        self.user = User.objects.create_user(username='testuser', password='password')
-
-        # Crear una transacción de ejemplo
+        self.user = User.objects.create_user(username='testuser', password='12345')
         self.transaccion = Transaccion.objects.create(
-            user=self.user,
-            buy_order='12345',
-            session_id='67890',
-            amount=1000,
-            status='PENDING',
-            card_number='1234',
-            accounting_date='2023-06-29',
-            transaction_date='2023-06-29',
-            authorization_code='6789',
-            payment_type_code='CARD',
-            response_code=0,
-            installments_number=1
-        )
-
-        # Crear un estado de ejemplo
-        self.estado = Estado.objects.create(nom_estado='PENDING')
-
+            user=self.user, buy_order='12345678', session_id='abc123', amount=10000, 
+            status='AUTHORIZED', card_number='1234', accounting_date='2023-01-01', 
+            transaction_date='2023-01-01', authorization_code='000000', 
+            payment_type_code='VD', response_code=0, installments_number=1)
+        self.estado = Estado.objects.create(nom_estado='Pendiente')
         self.order = Order.objects.create(
-            user= self.user,
-            subtotal= 1234,
-            costo_despacho= 3990,
-            total= 123445,
-            tipo_entrega= 'despacho',
-            direccion= 'direccion 1',
-            fecha_entrega= '2024-07-04',
-            correo= 'asd@correo.com',
-            transaccion= self.transaccion,
-            estado= self.estado
-        )
+            user=self.user, subtotal=10000, costo_despacho=500, total=10500, 
+            tipo_entrega='Envio', direccion='123 Fake St', fecha_entrega='2023-01-01', 
+            correo='testuser@example.com', transaccion=self.transaccion, estado=self.estado)
+        self.producto = Producto.objects.create(
+            nombre='Producto Test', precio=1000, descripcion='Descripción del Producto Test',
+            stock=100, marca=Marca.objects.create(nom_marca='Marca Test'), 
+            categoria=Categoria.objects.create(nom_categoria='Categoría Test'))
 
-        self.marca = Marca.objects.create(nom_marca='marca')
-        self.categoria = Categoria.objects.create(nom_categoria='categoria')
-
-        self.producto1 = Producto.objects.create(
-            nombre= 'Producto Test',
-            precio= 100,
-            descripcion= 'Descripción del Producto Test',
-            stock= 10,
-            marca= self.marca,
-            categoria= self.categoria,
-        )
-
-        self.producto2 = Producto.objects.create(
-            nombre= 'Producto Test 2',
-            precio= 100,
-            descripcion= 'Descripción del Producto Test 2',
-            stock= 10,
-            marca= self.marca,
-            categoria= self.categoria,
-        )
-
-    def test_order_item_single(self):
-        # Datos del item de orden a crear
+    def test_create_single_order_item(self):
         order_item_data = {
-            'order': self.order.id,  
-            'producto': self.producto1.id,
-            'cantidad': 2
+            'order': self.order.id,
+            'producto': self.producto.id,
+            'cantidad': 5
         }
-
-        request = self.factory.post('/order-items/', data=order_item_data)
-        response = order_items(request=request)
+        request = self.factory.post('/order-items/', order_item_data, format='json')
+        response = order_items(request)
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-
-        # Verificar que se haya creado correctamente el OrderItem en la base de datos
-        self.assertTrue(OrderItem.objects.exists())
-
-    def test_order_item_list(self):
-        # Datos de lista de items de orden a crear
+        self.assertEqual(response.data['order'], self.order.id)
+        self.assertEqual(response.data['producto'], self.producto.id)
+        self.assertEqual(response.data['cantidad'], 5)
+        
+    def test_create_multiple_order_items(self):
         order_items_data = [
             {
-                'order': self.order.id,  # Esto se llenará automáticamente al crear la OrderItem
-                'producto': self.producto1.id,  # Ajusta el producto según tus necesidades
-                'cantidad': 3
+                'order': self.order.id,
+                'producto': self.producto.id,
+                'cantidad': 2
             },
             {
-                'order': self.order.id,  # Esto se llenará automáticamente al crear la OrderItem
-                'producto': self.producto2.id,  # Ajusta el producto según tus necesidades
-                'cantidad': 1
+                'order': self.order.id,
+                'producto': self.producto.id,
+                'cantidad': 3
             }
         ]
-
-        request = self.factory.post('/order-items/', order_items_data, many=True),
-        response = order_items(request.data, list)
+        request = self.factory.post('/order-items/', json.dumps(order_items_data), content_type='application/json')
+        response = order_items(request)
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(len(response.data), 2)
+        self.assertEqual(response.data[0]['cantidad'], 2)
+        self.assertEqual(response.data[1]['cantidad'], 3)
 
-        # Verificar que se hayan creado correctamente los OrderItems en la base de datos
-        self.assertEqual(OrderItem.objects.count(), 2)
-'''
 
 
-class TransbankCreateTestCase(TestCase):
 
+class TransbankCreateAPITests(TestCase):
     def setUp(self):
         self.factory = APIRequestFactory()
 
-    def test_transbank_create_success(self):
-        # Datos de prueba para simular la solicitud
-        transbank_data = {
-            'amount': 1000,
-            'buy_order': '12345',
-            'session_id': '67890',
-            'url': 'url'
+    @responses.activate
+    def test_transbank_create(self):
+        # Simula la respuesta de Transbank
+        transbank_response = {
+            'token': 'fake_token',
+            'url': 'https://fakeurl.com'
         }
-        # Simular la solicitud POST
-        url = reverse('transbank-create')  # Asegúrate de tener el nombre correcto de la URL en tus URLs
-        request = self.factory.post(url, json.dumps(transbank_data), content_type='application/json')
+        responses.add(
+            responses.POST,
+            'https://webpay3gint.transbank.cl/rswebpaytransaction/api/webpay/v1.2/transactions',
+            json=transbank_response,
+            status=200
+        )
 
-        # Mockear la respuesta de Transbank
-        mock_response_data = {'token': 'mocked_token', 'response_code': 0}  # Simula la respuesta de Transbank
-        mock_response = MagicMock()
-        mock_response.json.return_value = mock_response_data
-        with patch('requests.post', return_value=mock_response):
-            response = transbank_create(request)
+        # Datos de prueba para enviar en la solicitud POST
+        request_data = {
+            'buy_order': '12345678',
+            'session_id': 'abc123',
+            'amount': 10000,
+            'return_url': 'https://www.return.url'
+        }
+        
+        # Crea una solicitud POST simulada a la vista transbank_create
+        request = self.factory.post('/transaction/create/', json.dumps(request_data), content_type='application/json')
 
-        # Verificar que la respuesta sea un JsonResponse con el contenido esperado
-        self.assertIsInstance(response, JsonResponse)
-        self.assertEqual(response.status_code, 200)
-
-        response_data = json.loads(response.content)
-        self.assertEqual(response_data['token'], 'mocked_token')
-        self.assertEqual(response_data['response_code'], 0)
-
-    def test_transbank_create_json_decode_error(self):
-        # Simular una solicitud con datos JSON inválidos
-        url = reverse('transbank-create')
-        request = self.factory.post(url, '{invalid-json}', content_type='application/json')
-
-        # Llamar a la función y verificar la respuesta
+        # Invoca la función transbank_create con la solicitud simulada
         response = transbank_create(request)
 
-        # Verificar que la respuesta sea un JsonResponse con un mensaje de error y código 500
-        self.assertIsInstance(response, JsonResponse)
-        self.assertEqual(response.status_code, 500)
-        response_data = json.loads(response.content)
-        self.assertIn('error', response_data)
+        # Verifica que la respuesta sea HTTP 200 OK
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
+        # Verifica que los datos devueltos por Transbank sean correctos
+        response_data = json.loads(response.content)
+        self.assertEqual(response_data, transbank_response)
+
+        # Verifica que la solicitud a Transbank se haya realizado correctamente
+        self.assertEqual(len(responses.calls), 1)
+        self.assertEqual(responses.calls[0].request.url, 'https://webpay3gint.transbank.cl/rswebpaytransaction/api/webpay/v1.2/transactions')
+        self.assertEqual(json.loads(responses.calls[0].request.body), request_data)
+
+
+
+
+class TransbankCommitAPITests(TestCase):
+    def setUp(self):
+        self.factory = APIRequestFactory()
+
+    @responses.activate
+    def test_transbank_commit(self):
+        # Simula la respuesta de Transbank
+        tokenws = "fake_tokenws"
+        transbank_response = {
+            'status': 'AUTHORIZED',
+            'amount': 10000,
+            'buy_order': '12345678',
+            'session_id': 'abc123'
+        }
+        responses.add(
+            responses.PUT,
+            f'https://webpay3gint.transbank.cl/rswebpaytransaction/api/webpay/v1.2/transactions/{tokenws}',
+            json=transbank_response,
+            status=200
+        )
+
+        # Crea una solicitud PUT simulada a la vista transbank_commit
+        request = self.factory.put(f'/commit/{tokenws}/')
+
+        # Invoca la función transbank_commit con la solicitud simulada
+        response = transbank_commit(request, tokenws=tokenws)
+
+        # Verifica que la respuesta sea HTTP 200 OK
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # Verifica que los datos devueltos por Transbank sean correctos
+        response_data = json.loads(response.content)
+        self.assertEqual(response_data, transbank_response)
+
+        # Verifica que la solicitud a Transbank se haya realizado correctamente
+        self.assertEqual(len(responses.calls), 1)
+        self.assertEqual(responses.calls[0].request.url, f'https://webpay3gint.transbank.cl/rswebpaytransaction/api/webpay/v1.2/transactions/{tokenws}')
 
 
 

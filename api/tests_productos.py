@@ -8,7 +8,7 @@ from .serializer import ProductoSerializer, ProductoCreateSerializer
 from django.core.files.uploadedfile import SimpleUploadedFile 
 from PIL import Image
 
-'''
+
 class ProductoAPITests(TestCase):
     def setUp(self):
         self.factory = APIRequestFactory()
@@ -190,4 +190,3 @@ class getProductosMarcaAPITests(TestCase):
 
         serializer = ProductoSerializer([self.producto1, self.producto2], many=True)
         self.assertEqual(response.data['productos'], serializer.data)
-'''
