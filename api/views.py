@@ -80,9 +80,14 @@ def create_producto(request):
 # obtener solo un producto
 @api_view(['GET'])
 def get_producto(request, pk):
-  producto = Producto.objects.get(id=pk)
-  serializer = ProductoSerializer(producto, many=False)
-  return Response(serializer.data)
+    try:
+        producto = Producto.objects.get(id=pk)
+        serializer = ProductoSerializer(producto)
+        return Response(serializer.data)
+    except Producto.DoesNotExist:
+        return Response({'detail': 'Producto no encontrado.'}, status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        return Response({'detail': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 # actualizar producto
 @api_view(['PUT'])
