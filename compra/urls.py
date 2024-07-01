@@ -13,7 +13,7 @@ urlpatterns = [
   path('region/', views.region),
   path('provincia/<str:id>/', views.provincia),
   path('comuna/<str:id>/', views.comuna),
-  path('direccion/<str:id>/', views.direccion),
+  path('direccion/<int:id>/', views.direccion),
   path('sucursales/', views.sucursal),
   path('crear-orden-compra/', views.crear_orden_compra),
   path('order-items/', views.order_items),

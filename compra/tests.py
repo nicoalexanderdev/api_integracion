@@ -27,10 +27,10 @@ class RegionGetAPITests(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         self.assertEqual(len(response.data), 2)  
-'''
 
 
-'''
+
+
 class ProvinciaGetAPITests(TestCase):
     def setUp(self):
         self.factory = APIRequestFactory()
@@ -144,10 +144,10 @@ class AgregarDireccionTest(TestCase):
         serializer_data = serializer.data
 
         self.assertEqual(response_data, serializer_data)
-'''
 
 
-'''
+
+
 class ObtenerDireccionUsuarioTest(TestCase):
     def setUp(self):
         self.factory = APIRequestFactory()
