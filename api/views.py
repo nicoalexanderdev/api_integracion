@@ -5,6 +5,7 @@ from .serializer import MarcaSerializer, CategoriaSerializer, ProductoSerializer
 from .models import Marca, Categoria, Producto
 from rest_framework import status
 from rest_framework.parsers import MultiPartParser, FormParser
+from django.db.models import Q
 
 # Create your views here.
 
@@ -59,6 +60,21 @@ def delete_marca(request, pk):
 
 
 # views productos
+
+@api_view(['GET'])
+def buscar_productos(request):
+    query = request.GET.get('search', '')
+    if query:
+        productos = Producto.objects.filter(
+            Q(nombre__icontains=query) | 
+            Q(marca__nom_marca__icontains=query) | 
+            Q(categoria__nom_categoria__icontains=query)
+        )
+    else:
+        productos = Producto.objects.all()
+    
+    serializer = ProductoSerializer(productos, many=True)
+    return Response(serializer.data, status=status.HTTP_200_OK)
 
 # obtener todos los productos
 @api_view(['GET'])
