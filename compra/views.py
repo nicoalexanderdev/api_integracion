@@ -9,12 +9,57 @@ from djangoconfig import settings
 from .serializer import  ProvinciaSerializer, TransaccionSerializer, DireccionSerializer, RegionSerializer, ComunaSerializer, DireccionCreateSerializer, SucursalSerializer, OrderSerializer, OrderItemSerializer, GetOrdersSerializer
 from rest_framework.response import Response
 from rest_framework import status
-from .models import Region, Provincia, Comuna, Direccion, Sucursal, Carro, CarroItem, Order, OrderItem
+from .models import Estado, Region, Provincia, Comuna, Direccion, Sucursal, Carro, CarroItem, Order, OrderItem
 from datetime import date
 from django.contrib.auth.models import User
 from api.models import Producto
 
 # Create your views here.
+@api_view(['GET'])
+def get_order(request, pk):
+    try:
+        order = Order.objects.get(id=pk)
+        serializer = GetOrdersSerializer(order, many=False)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    except Order.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+    
+    
+
+@api_view(['PATCH'])
+def update_order_status(request, pk):
+    order = get_object_or_404(Order, pk=pk)
+    estado_id = request.data.get('estado_id')
+
+    if not estado_id:
+        return Response({"error": "Id del estado es requerido"}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        estado = Estado.objects.get(pk=estado_id)
+    except Estado.DoesNotExist:
+        return Response({"error": "Estado not found"}, status=status.HTTP_404_NOT_FOUND)
+
+    order.estado = estado
+    order.save()
+
+    serializer = GetOrdersSerializer(order)
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+def get_estado_query(request):
+    try:
+        query = request.GET.get('estado', '')
+        if query:
+            if not query.isdigit():
+                return Response({"error": "Invalid estado ID"}, status=status.HTTP_400_BAD_REQUEST)
+            ordenes = Order.objects.filter(estado__id=query)
+        else:
+            ordenes = Order.objects.all()
+
+        serializer = GetOrdersSerializer(ordenes, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 @api_view(['GET'])
