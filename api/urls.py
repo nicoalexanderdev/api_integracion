@@ -20,4 +20,5 @@ urlpatterns = [
   path('get-categoria/<str:pk>/', views.get_categoria),
   path('delete-categoria/<str:pk>/', views.delete_categoria),
   path('buscar-productos', views.buscar_productos),
+  path('update/stock/<int:pk>', views.update_stock_producto),
 ]

@@ -135,6 +135,24 @@ def update_producto(request, pk):
     print("Errores del serializer: ", serializer.errors)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
+@api_view(['PATCH'])
+def update_stock_producto(request, pk):
+    producto = get_object_or_404(Producto, pk=pk)
+    nuevo_stock = request.data.get('stock')
+
+    if not nuevo_stock:
+        return Response({"error": "stock es requerido"}, status=status.HTTP_400_BAD_REQUEST)
+
+    producto.stock = nuevo_stock
+    producto.save()
+
+    serializer = ProductoCreateSerializer(producto)
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+
+
 # eliminar producto
 
 
