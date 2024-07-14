@@ -22,6 +22,9 @@ class ProductoSerializer(serializers.ModelSerializer):
         fields = ('id', 'nombre', 'precio', 'descripcion', 'image_url', 'stock', 'marca', 'categoria')
 
 class ProductoCreateSerializer(serializers.ModelSerializer):
+   
+   image_url = serializers.ImageField(required=False)
+   
    class Meta:
       model = Producto
-      fields = ('id', 'nombre', 'precio', 'descripcion', 'image_url', 'stock', 'marca', 'categoria')
+      fields = ('nombre', 'precio', 'descripcion', 'image_url', 'stock', 'marca', 'categoria')

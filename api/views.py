@@ -1,6 +1,6 @@
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
-from rest_framework.decorators import api_view, permission_classes, authentication_classes
+from rest_framework.decorators import api_view, permission_classes, authentication_classes, parser_classes
 from .serializer import MarcaSerializer, CategoriaSerializer, ProductoSerializer, ProductoCreateSerializer
 from .models import Marca, Categoria, Producto
 from rest_framework import status
@@ -95,13 +95,15 @@ def get_productos(request):
 
 # agregar producto
 @api_view(['POST'])
+@parser_classes([MultiPartParser, FormParser])
 def create_producto(request):
-    parser_classes = (MultiPartParser, FormParser)
+    print("Datos recibidos: ", request.data)
     serializer = ProductoCreateSerializer(
         data=request.data, context={'request': request})
     if serializer.is_valid():
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+    print("Errores del serializer: ", serializer.errors)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -124,12 +126,14 @@ def get_producto(request, pk):
 @api_view(['PUT'])
 def update_producto(request, pk):
     producto = Producto.objects.get(id=pk)
-    serializer = ProductoSerializer(instance=producto, data=request.data)
+    serializer = ProductoCreateSerializer(instance=producto, data=request.data)
 
     if serializer.is_valid():
         serializer.save()
-
-    return Response(serializer.data)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    print(serializer.data)
+    print("Errores del serializer: ", serializer.errors)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 # eliminar producto
 
