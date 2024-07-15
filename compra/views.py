@@ -6,15 +6,24 @@ import json
 from django.views.decorators.csrf import csrf_exempt
 
 from djangoconfig import settings
-from .serializer import  ProvinciaSerializer, TransaccionSerializer, DireccionSerializer, RegionSerializer, ComunaSerializer, DireccionCreateSerializer, SucursalSerializer, OrderSerializer, OrderItemSerializer, GetOrdersSerializer
+from .serializer import  ProvinciaSerializer, TransaccionSerializer, DireccionSerializer, RegionSerializer, ComunaSerializer, DireccionCreateSerializer, SucursalSerializer, OrderSerializer, OrderItemSerializer, GetOrdersSerializer, GetTransaccionSerializer
 from rest_framework.response import Response
 from rest_framework import status
-from .models import Estado, Region, Provincia, Comuna, Direccion, Sucursal, Carro, CarroItem, Order, OrderItem
+from .models import Estado, Region, Provincia, Comuna, Direccion, Sucursal, Carro, CarroItem, Order, OrderItem, Transaccion
 from datetime import date
 from django.contrib.auth.models import User
 from api.models import Producto
 
 # Create your views here.
+
+@api_view(['GET'])
+def get_transactions(request):
+    transactions = Transaccion.objects.all()
+    serializer = GetTransaccionSerializer(transactions, many=True)
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+
 @api_view(['GET'])
 def get_order(request, pk):
     try:

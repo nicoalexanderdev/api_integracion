@@ -19,5 +19,6 @@ urlpatterns = [
   path('order-items/', views.order_items),
   path('buy-orders', views.get_estado_query),
   path('buy-orders/<int:pk>/update-status/', views.update_order_status),
-  path('buy-orders/<int:pk>', views.get_order)
+  path('buy-orders/<int:pk>', views.get_order),
+  path('transactions', views.get_transactions)
 ]

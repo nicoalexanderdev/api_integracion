@@ -2,6 +2,8 @@ from rest_framework import serializers
 from .models import Transaccion, Direccion, Region, Provincia, Comuna, Sucursal, Carro, CarroItem, Order, OrderItem, Estado
 from django.contrib.auth.models import User
 from api.serializer import ProductoSerializer
+from user.serializer import UserSerializer 
+
 
 class EstadoSerializer(serializers.ModelSerializer):
     class Meta:
@@ -72,6 +74,29 @@ class CarroSerializer(serializers.ModelSerializer):
     class Meta:
         model = Carro
         fields = ['id', 'user', 'created_at', 'items', 'subtotal_carro', 'total_items']
+
+
+class GetTransaccionSerializer(serializers.ModelSerializer):
+
+    user = UserSerializer()
+    
+    class Meta:
+        model = Transaccion
+        fields = [
+        'id',
+        'user', 
+        'buy_order', 
+        'session_id', 
+        'amount', 
+        'status', 
+        'card_number', 
+        'accounting_date', 
+        'transaction_date', 
+        'authorization_code',
+        'payment_type_code',
+        'response_code',
+        'installments_number'
+      ]
 
 
 class TransaccionSerializer(serializers.ModelSerializer):
