@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -38,7 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'rest_framework.authtoken',
+    'rest_framework_simplejwt',
     'drf_spectacular',
     'api',
     'user',
@@ -96,7 +97,6 @@ DATABASES = {
 }
 
 
-
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
 
@@ -133,7 +133,6 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-import os
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
@@ -145,10 +144,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework.authentication.TokenAuthentication',
-    ),
-    'DEFAULT_PERMISSION_CLASSES': (
-        'rest_framework.permissions.IsAuthenticated',
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
@@ -163,10 +159,11 @@ SPECTACULAR_SETTINGS = {
 # CORS
 
 CORS_ALLOWED_ORIGINS = [
-    'http://127.0.0.1:7000', 
-    'http://localhost:8100'
+    'http://127.0.0.1:7000',
+    'http://localhost:8100',
+    'http://localhost:4200'
 ]
 
 # CORS_ORIGIN_WHITELIST = [
-#     'http://127.0.0.1:7000', 
+#     'http://127.0.0.1:7000',
 # ]

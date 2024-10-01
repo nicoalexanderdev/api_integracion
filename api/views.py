@@ -1,13 +1,12 @@
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
-from rest_framework.decorators import api_view, permission_classes, authentication_classes, parser_classes
+from rest_framework.decorators import api_view, permission_classes, parser_classes
 from .serializer import MarcaSerializer, CategoriaSerializer, ProductoSerializer, ProductoCreateSerializer
 from .models import Marca, Categoria, Producto
 from rest_framework import status
 from rest_framework.parsers import MultiPartParser, FormParser
 from django.db.models import Q
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.authentication import TokenAuthentication
 
 # Create your views here.
 
@@ -84,13 +83,11 @@ def buscar_productos(request):
 
 # obtener todos los productos
 @api_view(['GET'])
-@authentication_classes([TokenAuthentication])
 @permission_classes([IsAuthenticated])
 def get_productos(request):
     productos = Producto.objects.all()
     serializer = ProductoSerializer(productos, many=True)
     return Response(serializer.data)
-
 
 
 # agregar producto
@@ -105,7 +102,6 @@ def create_producto(request):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     print("Errores del serializer: ", serializer.errors)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
 
 
 # obtener solo un producto
@@ -149,8 +145,6 @@ def update_stock_producto(request, pk):
 
     serializer = ProductoCreateSerializer(producto)
     return Response(serializer.data, status=status.HTTP_200_OK)
-
-
 
 
 # eliminar producto
