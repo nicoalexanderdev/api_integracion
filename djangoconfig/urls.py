@@ -7,9 +7,9 @@ from rest_framework_simplejwt import views as jwt_views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/productos/', include('api.urls')),
+    path('api/', include('api.urls')),
     path('api/accounts/', include('user.urls')),
-    path('api/compras/', include('compra.urls')),
+    path('api/shopping/', include('compra.urls')),
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
     path('api/schema/docs/', SpectacularSwaggerView.as_view(url_name='schema')),
     path('api/token', jwt_views.TokenObtainPairView.as_view(),

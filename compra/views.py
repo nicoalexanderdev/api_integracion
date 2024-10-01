@@ -6,7 +6,7 @@ import json
 from django.views.decorators.csrf import csrf_exempt
 
 from djangoconfig import settings
-from .serializer import  ProvinciaSerializer, TransaccionSerializer, DireccionSerializer, RegionSerializer, ComunaSerializer, DireccionCreateSerializer, SucursalSerializer, OrderSerializer, OrderItemSerializer, GetOrdersSerializer, GetTransaccionSerializer
+from .serializer import ProvinciaSerializer, TransaccionSerializer, DireccionSerializer, RegionSerializer, ComunaSerializer, DireccionCreateSerializer, SucursalSerializer, OrderSerializer, OrderItemSerializer, GetOrdersSerializer, GetTransaccionSerializer, CarroSerializer, CarroItemSerializer
 from rest_framework.response import Response
 from rest_framework import status
 from .models import Estado, Region, Provincia, Comuna, Direccion, Sucursal, Carro, CarroItem, Order, OrderItem, Transaccion
@@ -16,12 +16,12 @@ from api.models import Producto
 
 # Create your views here.
 
+
 @api_view(['GET'])
 def get_transactions(request):
     transactions = Transaccion.objects.all()
     serializer = GetTransaccionSerializer(transactions, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
-
 
 
 @api_view(['GET'])
@@ -32,8 +32,7 @@ def get_order(request, pk):
         return Response(serializer.data, status=status.HTTP_200_OK)
     except Order.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
-    
-    
+
 
 @api_view(['PATCH'])
 def update_order_status(request, pk):
@@ -53,6 +52,7 @@ def update_order_status(request, pk):
 
     serializer = GetOrdersSerializer(order)
     return Response(serializer.data, status=status.HTTP_200_OK)
+
 
 @api_view(['GET'])
 def get_estado_query(request):
@@ -77,17 +77,21 @@ def buy_orders(request):
     serializer = GetOrdersSerializer(orders, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
 
+
 @api_view(['POST'])
 def order_items(request):
     if isinstance(request.data, list):
-        serializer = OrderItemSerializer(data=request.data, many=True, context={'request': request})
+        serializer = OrderItemSerializer(
+            data=request.data, many=True, context={'request': request})
     else:
-        serializer = OrderItemSerializer(data=request.data, context={'request': request})
+        serializer = OrderItemSerializer(
+            data=request.data, context={'request': request})
 
     if serializer.is_valid():
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 @api_view(['POST'])
 def crear_orden_compra(request):
@@ -100,7 +104,7 @@ def crear_orden_compra(request):
 
 @api_view(['GET'])
 def sucursal(request):
-    sucursales =Sucursal.objects.all()
+    sucursales = Sucursal.objects.all()
     serializer = SucursalSerializer(sucursales, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -115,6 +119,7 @@ def comuna(request, id):
     except Exception as e:
         return Response({'detail': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+
 @api_view(['GET'])
 def provincia(request, id):
     try:
@@ -125,6 +130,7 @@ def provincia(request, id):
     except Exception as e:
         return Response({'detail': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+
 @api_view(['GET'])
 def region(request):
     try:
@@ -133,7 +139,8 @@ def region(request):
         return Response(serializer.data, status=status.HTTP_200_OK)
     except Exception as e:
         return Response({'detail': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        
+
+
 @api_view(['GET'])
 def direccion(request, id):
     try:
@@ -143,7 +150,6 @@ def direccion(request, id):
         return Response(serializer.data, status=status.HTTP_200_OK)
     except Exception as e:
         return Response({'detail': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
 
 
 @api_view(['POST'])
@@ -157,8 +163,6 @@ def agregar_direccion(request):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     except Exception as e:
         return Response({'detail': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-    
-
 
 
 def headers_request_transbank():
@@ -286,7 +290,7 @@ def transbank_capture(request, tokenws):
         headers = headers_request_transbank()
         response = requests.put(url, headers=headers)
         response_data = response.json()
-        print('response: ', response_data)  
+        print('response: ', response_data)
 
         return JsonResponse(response_data, safe=False)
 
@@ -322,7 +326,6 @@ def get_dollar_value(request):
         response.raise_for_status()
         dolar = response.json()
 
-
         # Obtener el valor del día actual
         today_value = None
         for obs in dolar.get('Series', {}).get('Obs', []):
@@ -348,3 +351,91 @@ def get_dollar_value(request):
     except Exception as e:
         print(f"Error al obtener valor del dolar: {e}")
         return JsonResponse({'error': str(e)}, status=500)
+
+
+# Carro de compras
+
+
+@api_view(['POST'])
+def add_to_cart(request):
+    user = request.user
+    product_id = request.data.get('product_id')
+    cantidad = request.data.get('cantidad', 1)
+
+    producto = get_object_or_404(Producto, id=product_id)
+
+    # Buscar si el usuario ya tiene un carrito, si no, crear uno
+    carro, created = Carro.objects.get_or_create(user=user)
+
+    # Verificar si el producto ya está en el carrito
+    carro_item, item_created = CarroItem.objects.get_or_create(
+        carro=carro, producto=producto)
+
+    if item_created:
+        carro_item.cantidad = cantidad
+    else:
+        carro_item.cantidad += cantidad
+
+    carro_item.save()
+
+    return Response({"message": "Producto agregado al carrito"}, status=status.HTTP_200_OK)
+
+
+@api_view(['DELETE'])
+def remove_from_cart(request, item_id):
+    user = request.user
+    carro = get_object_or_404(Carro, user=user)
+    carro_item = get_object_or_404(CarroItem, id=item_id, carro=carro)
+
+    carro_item.delete()
+
+    return Response({"message": "Producto eliminado del carrito"}, status=status.HTTP_200_OK)
+
+
+@api_view(['PUT'])
+def update_cart_item(request, item_id):
+    user = request.user
+    carro = get_object_or_404(Carro, user=user)
+    carro_item = get_object_or_404(CarroItem, id=item_id, carro=carro)
+
+    cantidad = request.data.get('cantidad')
+
+    if cantidad is not None and int(cantidad) > 0:
+        carro_item.cantidad = cantidad
+        carro_item.save()
+        return Response({"message": "Cantidad actualizada"}, status=status.HTTP_200_OK)
+
+    return Response({"error": "Cantidad inválida"}, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['GET'])
+def cart_detail(request):
+    user = request.user
+    carro = get_object_or_404(Carro, user=user)
+    items = CarroItem.objects.filter(carro=carro)
+
+    carrito_data = {
+        "items": [
+            {
+                "producto": item.producto.nombre,
+                "precio": item.producto.precio,
+                "cantidad": item.cantidad,
+                "subtotal": item.subtotal_item()
+            }
+            for item in items
+        ],
+        "subtotal": carro.subtotal_carro(),
+        "total_items": carro.total_items(),
+    }
+
+    return Response(carrito_data, status=status.HTTP_200_OK)
+
+
+@api_view(['DELETE'])
+def clear_cart(request):
+    user = request.user
+    carro = get_object_or_404(Carro, user=user)
+
+    carro.items.all().delete()
+
+    return Response({"message": "Carrito vaciado"}, status=status.HTTP_200_OK)
